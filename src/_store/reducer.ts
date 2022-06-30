@@ -10,7 +10,8 @@ export const intializeState = (): GameState => {
       x: 1024,
       y: 576,
     },
-    spriteAnimations: {},
+    sprites: [],
+    sounds: [],
     scene: 'title',
     fps: 60,
   };
@@ -22,11 +23,28 @@ export const gameReducer = createReducer(
     return { ...state, loading: true };
   }),
   on(GameActions.SuccessGetGameDataAction, (state: GameState, { payload }) => {
+    // Load Images to state
+    const imgs = payload.sprites.map((sprite) => {
+      const img = new Image();
+      img.src = sprite.src;
+      return {
+        ...sprite,
+        img: img,
+      };
+    });
+    const soundLibrary = payload.sounds.map((sound) => {
+      const audio = new Audio(sound.src);
+      return {
+        ...sound,
+        audio,
+      };
+    });
     return {
       ...state,
       loading: false,
       loaded: true,
-      spriteAnimations: payload.spriteAnimations,
+      sprites: imgs,
+      sounds: soundLibrary,
     };
   }),
   on(GameActions.ChangeScene, (state: GameState, { payload }) => {
