@@ -1,8 +1,8 @@
-# ANGULORE
+# TheLastTowerSaga
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.4.
 
-Angulore is a game template for Angular/NGRX users like myself. The goal is to be able to create a game in canvas while also getting the benefits of Typescript, NGRX state management, and Redux!
+TheLastTowerSaga is a game template for Angular/NGRX users like myself. The goal is to be able to create a game in canvas while also getting the benefits of Typescript, NGRX state management, and Redux!
 
 ## Development server
 

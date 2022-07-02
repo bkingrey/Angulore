@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Angulore": {
+    "TheLastTowerSaga": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -20,7 +20,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/Angulore",
+            "outputPath": "dist/TheLastTowerSaga",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -67,10 +67,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "Angulore:build:production"
+              "browserTarget": "TheLastTowerSaga:build:production"
             },
             "development": {
-              "browserTarget": "Angulore:build:development"
+              "browserTarget": "TheLastTowerSaga:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -78,7 +78,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "Angulore:build"
+            "browserTarget": "TheLastTowerSaga:build"
           }
         },
         "test": {
@@ -97,5 +97,5 @@
       }
     }
   },
-  "defaultProject": "Angulore"
+  "defaultProject": "TheLastTowerSaga"
 }

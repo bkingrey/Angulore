@@ -23,6 +23,8 @@ export const gameReducer = createReducer(
     return { ...state, loading: true };
   }),
   on(GameActions.SuccessGetGameDataAction, (state: GameState, { payload }) => {
+    // for (let i = 0; i < payload.farmableAreas.length; i += 36) {
+    //   newFarmableArea.push(payload.farmableAreas.slice(i, 36 + i));
     // Load Images to state
     const imgs = payload.sprites.map((sprite) => {
       const img = new Image();

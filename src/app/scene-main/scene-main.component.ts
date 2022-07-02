@@ -95,6 +95,26 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
     this.startAnimatingAtFPS(this.gameData.fps);
   }
 
+  // createFarmableArea(map) {
+  //   map.forEach((row, i) => {
+  //     row.forEach((symbol, j) => {
+  //       if (symbol !== 0 && this.mapImage) {
+  //         const newFarmableArea = {
+  //           position: {
+  //             x: j * this.boundary.width + this.mapImage.position.x,
+  //             y: i * this.boundary.height + this.mapImage.position.y,
+  //           },
+  //           width: this.boundary.width,
+  //           height: this.boundary.height,
+  //           state: 'none',
+  //           id: 'i' + i.toString() + 'j' + j.toString(),
+  //         };
+  //         this.farmableArea.push(newFarmableArea);
+  //       }
+  //     });
+  //   });
+  // }
+
   keyDownEvent(event: KeyboardEvent) {
     // Do something on keydown
   }

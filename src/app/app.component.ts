@@ -8,7 +8,7 @@ import { AppFacade } from './app.facade';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  title = 'Angulore';
+  title = 'TheLastTowerSaga';
 
   constructor(public facade: AppFacade) {}
 
