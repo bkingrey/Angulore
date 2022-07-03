@@ -1,4 +1,10 @@
 import {
+  GeneratedTile,
+  Position,
+  Sprite,
+  Tileset,
+} from './../../_store/models';
+import {
   AfterViewInit,
   Component,
   Input,
@@ -26,6 +32,8 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
     then: 0,
     elaspsed: 0,
   };
+  amountOfTiles = 49;
+  proceduralCorners: Array<GeneratedTile> = [];
   constructor() {
     super();
     this.animate = () => {
@@ -44,7 +52,7 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
       this.ctx.save();
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.drawBackground();
-      this.drawPlayer();
+      //this.drawPlayer();
       this.ctx.restore();
     }
   }
@@ -73,6 +81,112 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
       this.ctx.strokeStyle = 'black';
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.stroke();
+      const tileset = this.gameData.tilesets.filter(
+        (sprite) => sprite.id === 'floorTileset'
+      )[0];
+      this.drawStage(tileset);
+    }
+  }
+
+  drawStage(tileset: Tileset) {
+    for (let i = 0; i <= this.amountOfTiles; i++) {
+      for (let j = 0; j <= this.amountOfTiles; j++) {
+        // DRAW FLOOR
+        this.drawFromTileset(tileset, tileset.floor, {
+          x: i * tileset.frameWidth,
+          y: j * tileset.frameHeight,
+        });
+        let corner = this.getCorner(tileset, i, j);
+        let side = this.getSide(tileset, i, j);
+        let cornerOrSide = corner || side;
+        if (cornerOrSide) {
+          // DRAW CORNER OR SIDE
+          this.drawFromTileset(tileset, cornerOrSide, {
+            x: i * tileset.frameWidth,
+            y: j * tileset.frameHeight,
+          });
+        }
+      }
+    }
+    this.proceduralCorners.forEach((corner) => {
+      // DRAW PROCEDURAL CORNERS
+      this.drawFromTileset(tileset, corner.tileMapPosition, {
+        x: corner.x * tileset.frameWidth,
+        y: corner.y * tileset.frameHeight,
+      });
+    });
+  }
+
+  getCorner(tileset: Tileset, i: number, j: number): Position | undefined {
+    if (i === 0 && j === 0) {
+      return tileset.topLeftCorner;
+    } else if (i === this.amountOfTiles && j === 0) {
+      return tileset.topRightCorner;
+    } else if (i === 0 && j === this.amountOfTiles) {
+      return tileset.bottomLeftCorner;
+    } else if (i === this.amountOfTiles && j === this.amountOfTiles) {
+      return tileset.bottomRightCorner;
+    }
+    return;
+  }
+
+  randomIntFromInterval(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+
+  getRandomCorner(tileset: Tileset) {
+    const random = this.randomIntFromInterval(5, this.amountOfTiles - 5);
+    let generatedTile: GeneratedTile = {
+      tileMapPosition: { x: 0, y: 0 },
+      x: 0,
+      y: 0,
+    };
+    if (random < 25) generatedTile.tileMapPosition = tileset.topLeftCorner;
+    else if (random < 50)
+      generatedTile.tileMapPosition = tileset.topRightCorner;
+    else if (random < 75)
+      generatedTile.tileMapPosition = tileset.bottomLeftCorner;
+    else generatedTile.tileMapPosition = tileset.bottomRightCorner;
+
+    generatedTile.x = this.randomIntFromInterval(5, this.amountOfTiles - 5);
+    generatedTile.y = this.randomIntFromInterval(5, this.amountOfTiles - 5);
+    return generatedTile;
+  }
+
+  getSide(tileset: Tileset, i: number, j: number): Position | undefined {
+    if (
+      j > 0 &&
+      j < this.amountOfTiles &&
+      (i === 0 || i === this.amountOfTiles)
+    ) {
+      return tileset.verticalSide;
+    } else if (
+      i > 0 &&
+      i < this.amountOfTiles &&
+      (j === 0 || j === this.amountOfTiles)
+    ) {
+      return tileset.horizontalSide;
+    }
+    return;
+  }
+
+  drawFromTileset(
+    tileset: Tileset,
+    tileMapPosition: Position,
+    canvasPosition: Position
+  ) {
+    if (this.ctx) {
+      this.ctx.drawImage(
+        tileset.img,
+        tileMapPosition.x, // tilemap position x
+        tileMapPosition.y, // tilemap position y
+        tileset.frameWidth, // width of tile
+        tileset.frameHeight, // height of tile
+        canvasPosition.x, // position on canvas x
+        canvasPosition.y, // positioin on canvas y
+        tileset.frameWidth, // draw width
+        tileset.frameHeight // draw height
+      );
     }
   }
 
@@ -91,29 +205,42 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.loadProceduralData();
     this.loadCanvas();
     this.startAnimatingAtFPS(this.gameData.fps);
   }
 
-  // createFarmableArea(map) {
-  //   map.forEach((row, i) => {
-  //     row.forEach((symbol, j) => {
-  //       if (symbol !== 0 && this.mapImage) {
-  //         const newFarmableArea = {
-  //           position: {
-  //             x: j * this.boundary.width + this.mapImage.position.x,
-  //             y: i * this.boundary.height + this.mapImage.position.y,
-  //           },
-  //           width: this.boundary.width,
-  //           height: this.boundary.height,
-  //           state: 'none',
-  //           id: 'i' + i.toString() + 'j' + j.toString(),
-  //         };
-  //         this.farmableArea.push(newFarmableArea);
-  //       }
-  //     });
-  //   });
-  // }
+  loadProceduralData() {
+    const tileset = this.gameData.tilesets.filter(
+      (tileset) => tileset.id === 'floorTileset'
+    )[0];
+    this.loadProceduralCorners(tileset);
+  }
+
+  loadProceduralCorners(tileset: Tileset) {
+    for (let i = 0; i < 15; i++) {
+      if (!this.proceduralCorners.length) {
+        this.proceduralCorners.push(this.getRandomCorner(tileset));
+      } else {
+        const newCorner = this.getRandomCorner(tileset);
+        let canPush = this.proceduralCorners.every((corner) => {
+          if (
+            newCorner.x >= corner.x + 5 ||
+            newCorner.y >= corner.y + 5 ||
+            newCorner.x <= corner.x - 5 ||
+            newCorner.y <= corner.y - 5
+          ) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+        if (canPush) {
+          this.proceduralCorners.push(newCorner);
+        }
+      }
+    }
+  }
 
   keyDownEvent(event: KeyboardEvent) {
     // Do something on keydown

@@ -1,0 +1,14 @@
+canvas {
+  display: block;
+  // background-color: #5fc14c;
+  position: absolute;
+  // top: 50%;
+  // left: 50%;
+  // transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 0;
+  outline: none;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}

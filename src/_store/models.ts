@@ -5,6 +5,7 @@ export interface GameState {
     x: number;
     y: number;
   };
+  tilesets: Array<Tileset>;
   sprites: Array<Sprite>;
   sounds: Array<Sound>;
   scene: string;
@@ -16,10 +17,36 @@ export interface Sound {
   src: string;
   audio: HTMLAudioElement;
 }
+
+export interface GeneratedTile {
+  tileMapPosition: Position;
+  x: number;
+  y: number;
+}
+
+export interface Tileset {
+  id: string;
+  src: string;
+  frames: number;
+  width: number;
+  height: number;
+  frameWidth: number;
+  frameHeight: number;
+  img: HTMLImageElement;
+  floor: Position;
+  topLeftCorner: Position;
+  topRightCorner: Position;
+  bottomLeftCorner: Position;
+  bottomRightCorner: Position;
+  horizontalSide: Position;
+  verticalSide: Position;
+}
 export interface Sprite {
   id: string;
   src: string;
   frames: number;
+  width: number;
+  height: number;
   frameWidth: number;
   frameHeight: number;
   velocity: number;
