@@ -10,13 +10,9 @@ export interface GameState {
   sounds: Array<Sound>;
   scene: string;
   amountOfTiles: number;
-  procedural: Procedurals;
+  roomPresets: Array<Array<string>>;
+  procedurals: Array<GeneratedTile>;
   fps: number;
-}
-
-export interface Procedurals {
-  corners: Array<GeneratedTile>;
-  sides: Array<GeneratedTile>;
 }
 
 export interface Sound {

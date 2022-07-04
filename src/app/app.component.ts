@@ -4,7 +4,7 @@ import {
   ChangeScene,
   GetGameData,
 } from 'src/_store/actions';
-import { GeneratedTile, Procedurals } from 'src/_store/models';
+import { GeneratedTile } from 'src/_store/models';
 import { AppFacade } from './app.facade';
 
 @Component({
@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
   }
 
   // DISPATCHES
-  sendProceduralData(payload: Procedurals) {
+  sendProceduralData(payload: Array<GeneratedTile>) {
     this.facade.dispatch(ChangeProceduralData({ payload }));
   }
   changeScene(scene: string) {

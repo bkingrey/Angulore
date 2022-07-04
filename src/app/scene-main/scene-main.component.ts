@@ -120,20 +120,26 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
         }
       }
     }
-    // DRAW PROCEDURAL CORNERS
-    this.gameData.procedural.corners.forEach((corner) => {
-      this.drawFromTileset(tileset, corner.tileMapPosition, {
-        x: corner.x * tileset.frameWidth,
-        y: corner.y * tileset.frameHeight,
+    this.gameData.procedurals.forEach((procedural) => {
+      this.drawFromTileset(tileset, procedural.tileMapPosition, {
+        x: procedural.x * tileset.frameWidth,
+        y: procedural.y * tileset.frameHeight,
       });
     });
-    // DRAW PROCEDURAL SIDES
-    this.gameData.procedural.sides.forEach((side) => {
-      this.drawFromTileset(tileset, side.tileMapPosition, {
-        x: side.x * tileset.frameWidth,
-        y: side.y * tileset.frameHeight,
-      });
-    });
+    // // DRAW PROCEDURAL CORNERS
+    // this.gameData.procedural.corners.forEach((corner) => {
+    //   this.drawFromTileset(tileset, corner.tileMapPosition, {
+    //     x: corner.x * tileset.frameWidth,
+    //     y: corner.y * tileset.frameHeight,
+    //   });
+    // });
+    // // DRAW PROCEDURAL SIDES
+    // this.gameData.procedural.sides.forEach((side) => {
+    //   this.drawFromTileset(tileset, side.tileMapPosition, {
+    //     x: side.x * tileset.frameWidth,
+    //     y: side.y * tileset.frameHeight,
+    //   });
+    // });
   }
 
   drawFromTileset(

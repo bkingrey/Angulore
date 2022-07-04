@@ -1,50 +1,29 @@
 import { EventEmitter, Output } from '@angular/core';
-import {
-  GameState,
-  GeneratedTile,
-  Position,
-  Procedurals,
-  Tileset,
-} from 'src/_store/models';
+import { GameState, GeneratedTile, Position, Tileset } from 'src/_store/models';
 
 export class MainUtils {
-  loadProceduralData(gameData: GameState): Procedurals {
+  loadProceduralData(gameData: GameState): Array<GeneratedTile> {
+    const proceduralData: Array<GeneratedTile> = [];
     const tileset = gameData.tilesets[0];
-    const proceduralCorners = [...gameData.procedural.corners];
-    const proceduralSides = [...gameData.procedural.sides];
-    for (let i = 0; i < 55; i++) {
-      if (!proceduralCorners.length) {
-        proceduralCorners.push(
-          this.getRandomCorner(tileset, gameData.amountOfTiles)
-        );
-      } else {
-        const newCorner = this.getRandomCorner(tileset, gameData.amountOfTiles);
-        let canPush = proceduralCorners.every((corner) => {
-          if (
-            newCorner.x >= corner.x + 5 ||
-            newCorner.y >= corner.y + 5 ||
-            newCorner.x <= corner.x - 5 ||
-            newCorner.y <= corner.y - 5
-          ) {
-            return true;
-          } else {
-            return false;
+    const rowLength = Math.sqrt(gameData.roomPresets[0].length);
+    for (let l = 0; l < rowLength / 2; l++) {
+      for (let k = 0; k < rowLength / 2; k++) {
+        for (let i = 0; i < rowLength; i++) {
+          for (let j = 0; j < rowLength; j++) {
+            if (tileset[gameData.roomPresets[0][j + i * 10]]) {
+              proceduralData.push({
+                tileMapPosition:
+                  tileset[gameData.roomPresets[0][j + i * rowLength]],
+                x: j + k * rowLength,
+                y: i + l * rowLength,
+              });
+            }
           }
-        });
-        if (canPush) {
-          proceduralCorners.push(newCorner);
         }
       }
     }
-    proceduralCorners.forEach((corner) => {
-      for (let i = 0; i < 4; i++)
-        proceduralSides.push(
-          this.getMatchingHorizontalSide(tileset, corner, i)
-        );
-      for (let i = 0; i < 4; i++)
-        proceduralSides.push(this.getMatchingVerticalSide(tileset, corner, i));
-    });
-    return { corners: proceduralCorners, sides: proceduralSides };
+
+    return proceduralData;
   }
 
   getRandomCorner(tileset: Tileset, amountOfTiles: number) {

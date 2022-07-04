@@ -16,10 +16,8 @@ export const intializeState = (): GameState => {
     scene: 'title',
     fps: 60,
     amountOfTiles: 49,
-    procedural: {
-      corners: [],
-      sides: [],
-    },
+    roomPresets: [],
+    procedurals: [],
   };
 };
 
@@ -61,6 +59,7 @@ export const gameReducer = createReducer(
       loaded: true,
       sprites,
       tilesets,
+      roomPresets: payload.roomPresets,
     };
   }),
   on(GameActions.ChangeScene, (state: GameState, { payload }) => {
@@ -72,7 +71,7 @@ export const gameReducer = createReducer(
   on(GameActions.ChangeProceduralData, (state: GameState, { payload }) => {
     return {
       ...state,
-      procedural: payload,
+      procedurals: payload,
     };
   })
 );
