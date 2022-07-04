@@ -17,6 +17,7 @@ import {
 import { FPS, GameState } from 'src/_store/models';
 import { intializeState } from 'src/_store/reducer';
 import { MainUtils } from './scene-main.utils';
+import { Player } from '../classes/Player';
 
 @Component({
   selector: 'app-scene-main',
@@ -36,6 +37,7 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
     then: 0,
     elaspsed: 0,
   };
+  player: Player | undefined;
 
   constructor() {
     super();
@@ -52,9 +54,10 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
 
   drawingCode() {
     if (this.ctx && this.canvas) {
-      this.ctx.save();
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.ctx.scale(0.5, 0.5);
+      this.ctx.save();
+
+      this.ctx.scale(1, 1);
       this.drawBackground();
       this.drawPlayer();
       this.ctx.restore();
@@ -94,10 +97,30 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
 
   drawStage(tileset: Tileset) {
     this.gameData.procedurals.forEach((procedural) => {
-      this.drawFromTileset(tileset, procedural.tileMapPosition, {
-        x: procedural.x * tileset.frameWidth,
-        y: procedural.y * tileset.frameHeight,
-      });
+      if (procedural.entrance && this.ctx) {
+        this.ctx.beginPath();
+        this.ctx.fillStyle = 'blue';
+        this.ctx.fillRect(
+          procedural.x * tileset.frameWidth,
+          procedural.y * tileset.frameHeight,
+          tileset.frameWidth,
+          tileset.frameHeight
+        );
+      } else if (procedural.exit && this.ctx) {
+        this.ctx.beginPath();
+        this.ctx.fillStyle = 'red';
+        this.ctx.fillRect(
+          procedural.x * tileset.frameWidth,
+          procedural.y * tileset.frameHeight,
+          tileset.frameWidth,
+          tileset.frameHeight
+        );
+      } else {
+        this.drawFromTileset(tileset, procedural.tileMapPosition, {
+          x: procedural.x * tileset.frameWidth,
+          y: procedural.y * tileset.frameHeight,
+        });
+      }
     });
   }
 
@@ -122,22 +145,22 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
   }
 
   drawPlayer() {
-    if (this.canvas && this.ctx) {
-      this.ctx.beginPath();
-      this.ctx.rect(
-        this.canvas.width / 2 - 100,
-        this.canvas.height / 2 - 100,
-        200,
-        200
-      );
-      this.ctx.strokeStyle = 'red';
-      this.ctx.stroke();
+    if (
+      this.ctx &&
+      this.gameData.playerData.spriteSheet &&
+      this.gameData.playerData.position
+    ) {
+      if (!this.player) {
+        this.player = new Player(this.gameData.playerData);
+      } else {
+        this.player.draw(this.ctx);
+      }
     }
   }
 
-  ngAfterViewInit(): void {
-    this.generateDungeon();
+  ngAfterViewInit() {
     this.loadCanvas();
+    this.generateDungeon();
     this.startAnimatingAtFPS(this.gameData.fps);
   }
 
@@ -159,7 +182,7 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
 
   // DUNGEON GENERATION
 
-  async generateDungeon() {
+  generateDungeon() {
     let dungeon = new Dungeon({
       size: [400, 400],
       rooms: {
@@ -183,10 +206,8 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
       room_count: 40,
     });
 
-    await dungeon.generate();
-
+    dungeon.generate();
     if (dungeon.walls.rows.length) {
-      console.log(dungeon.walls.rows.length);
       const data = this.loadProceduralData(
         this.gameData,
         dungeon.walls.rows,

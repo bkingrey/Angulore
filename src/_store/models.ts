@@ -1,3 +1,4 @@
+import { Player } from './../app/classes/Player';
 export interface GameState {
   loaded: boolean;
   loading: boolean;
@@ -6,12 +7,19 @@ export interface GameState {
     y: number;
   };
   tilesets: Array<Tileset>;
+  playerData: PlayerData;
   sprites: Array<Sprite>;
   sounds: Array<Sound>;
   scene: string;
   amountOfTiles: number;
   procedurals: Array<GeneratedTile>;
   fps: number;
+}
+
+export interface PlayerData {
+  name: string;
+  position?: Position;
+  spriteSheet?: Sprite;
 }
 
 export interface Sound {
@@ -24,6 +32,10 @@ export interface GeneratedTile {
   tileMapPosition: Position;
   x: number;
   y: number;
+  boundary: boolean;
+  id: string;
+  entrance: boolean;
+  exit: boolean;
 }
 
 export interface Tileset {
@@ -52,7 +64,6 @@ export interface Sprite {
   frameWidth: number;
   frameHeight: number;
   velocity: number;
-  hitbox?: Hitbox;
   img: HTMLImageElement;
 }
 

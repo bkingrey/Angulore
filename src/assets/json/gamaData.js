@@ -528,7 +528,16 @@ export const gameData = {
     12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
     12, 12, 12, 12, 12, 12,
   ],
-  sprites: [],
+  sprites: [
+    {
+      id: "player-test-idle",
+      src: "assets/sprites/player-test-idle.png",
+      frameWidth: 16,
+      frameHeight: 16,
+      frames: 10,
+      velocity: 1,
+    },
+  ],
   tilesets: [
     {
       id: "floorTileset",

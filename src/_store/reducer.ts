@@ -1,6 +1,8 @@
+import { PlayerData } from 'src/_store/models';
 import { createReducer, on } from '@ngrx/store';
 import { GameState } from './models';
 import * as GameActions from './actions';
+import { Player } from 'src/app/classes/Player';
 
 export const intializeState = (): GameState => {
   return {
@@ -17,6 +19,9 @@ export const intializeState = (): GameState => {
     fps: 60,
     amountOfTiles: 49,
     procedurals: [],
+    playerData: {
+      name: 'John Doe',
+    },
   };
 };
 
@@ -58,6 +63,12 @@ export const gameReducer = createReducer(
       loaded: true,
       sprites,
       tilesets,
+      playerData: {
+        name: 'John Doe',
+        spriteSheet: sprites.filter(
+          (sprite) => sprite.id === 'player-test-idle'
+        )[0],
+      },
     };
   }),
   on(GameActions.ChangeScene, (state: GameState, { payload }) => {
@@ -67,9 +78,44 @@ export const gameReducer = createReducer(
     };
   }),
   on(GameActions.ChangeProceduralData, (state: GameState, { payload }) => {
+    const floorTiles = payload.filter((tile) => !tile.boundary);
+    const entrance = floorTiles[Math.floor(Math.random() * floorTiles.length)];
+    const remainingFloorTiles = floorTiles.filter(
+      (tile) => tile.id !== entrance.id
+    );
+    const exit =
+      remainingFloorTiles[Math.floor(Math.random() * floorTiles.length)];
+    const newPayload = payload.map((tile) => {
+      if (tile.id === entrance.id) {
+        return {
+          ...tile,
+          entrance: true,
+          exit: false,
+        };
+      } else if (tile.id === exit.id) {
+        return {
+          ...tile,
+          entrance: false,
+          exit: true,
+        };
+      }
+      return {
+        ...tile,
+        entrance: false,
+        exit: false,
+      };
+    });
+
     return {
       ...state,
-      procedurals: payload,
+      procedurals: newPayload,
+      playerData: {
+        ...state.playerData,
+        position: {
+          x: newPayload.filter((tile) => tile.entrance)[0].x,
+          y: newPayload.filter((tile) => tile.entrance)[0].y,
+        },
+      },
     };
   })
 );
