@@ -10,6 +10,7 @@
   },
   "private": true,
   "dependencies": {
+    "2d-dungeon": "0.0.7",
     "@angular/animations": "~13.3.0",
     "@angular/common": "~13.3.0",
     "@angular/compiler": "~13.3.0",

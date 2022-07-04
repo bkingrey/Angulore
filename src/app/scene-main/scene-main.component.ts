@@ -1,3 +1,4 @@
+import Dungeon from '2d-dungeon';
 import {
   GeneratedTile,
   Position,
@@ -53,8 +54,9 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
     if (this.ctx && this.canvas) {
       this.ctx.save();
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.scale(0.5, 0.5);
       this.drawBackground();
-      //this.drawPlayer();
+      this.drawPlayer();
       this.ctx.restore();
     }
   }
@@ -91,55 +93,12 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
   }
 
   drawStage(tileset: Tileset) {
-    for (let i = 0; i <= this.gameData.amountOfTiles; i++) {
-      for (let j = 0; j <= this.gameData.amountOfTiles; j++) {
-        // DRAW FLOOR
-        this.drawFromTileset(tileset, tileset.floor, {
-          x: i * tileset.frameWidth,
-          y: j * tileset.frameHeight,
-        });
-        let corner = this.getBorderCorner(
-          tileset,
-          i,
-          j,
-          this.gameData.amountOfTiles
-        );
-        let side = this.getBorderSide(
-          tileset,
-          i,
-          j,
-          this.gameData.amountOfTiles
-        );
-        let cornerOrSide = corner || side;
-        if (cornerOrSide) {
-          // DRAW CORNER OR SIDE
-          this.drawFromTileset(tileset, cornerOrSide, {
-            x: i * tileset.frameWidth,
-            y: j * tileset.frameHeight,
-          });
-        }
-      }
-    }
     this.gameData.procedurals.forEach((procedural) => {
       this.drawFromTileset(tileset, procedural.tileMapPosition, {
         x: procedural.x * tileset.frameWidth,
         y: procedural.y * tileset.frameHeight,
       });
     });
-    // // DRAW PROCEDURAL CORNERS
-    // this.gameData.procedural.corners.forEach((corner) => {
-    //   this.drawFromTileset(tileset, corner.tileMapPosition, {
-    //     x: corner.x * tileset.frameWidth,
-    //     y: corner.y * tileset.frameHeight,
-    //   });
-    // });
-    // // DRAW PROCEDURAL SIDES
-    // this.gameData.procedural.sides.forEach((side) => {
-    //   this.drawFromTileset(tileset, side.tileMapPosition, {
-    //     x: side.x * tileset.frameWidth,
-    //     y: side.y * tileset.frameHeight,
-    //   });
-    // });
   }
 
   drawFromTileset(
@@ -177,7 +136,7 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.sendProceduralData.emit(this.loadProceduralData(this.gameData));
+    this.generateDungeon();
     this.loadCanvas();
     this.startAnimatingAtFPS(this.gameData.fps);
   }
@@ -196,5 +155,64 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
 
   mouseRightClick(event: MouseEvent) {
     // Do something on right click
+  }
+
+  // DUNGEON GENERATION
+
+  async generateDungeon() {
+    let dungeon = new Dungeon({
+      size: [400, 400],
+      rooms: {
+        initial: {
+          min_size: [3, 3],
+          max_size: [3, 3],
+          max_exits: 1,
+        },
+        any: {
+          min_size: [2, 2],
+          max_size: [5, 5],
+          max_exits: 4,
+        },
+      },
+      max_corridor_length: 6,
+      min_corridor_length: 2,
+      corridor_density: 0,
+      symmetric_rooms: false,
+      interconnects: 2,
+      max_interconnect_length: 10,
+      room_count: 40,
+    });
+
+    await dungeon.generate();
+
+    if (dungeon.walls.rows.length) {
+      console.log(dungeon.walls.rows.length);
+      const data = this.loadProceduralData(
+        this.gameData,
+        dungeon.walls.rows,
+        dungeon.walls.rows.length,
+        dungeon.walls.rows[0].length
+      );
+      this.sendProceduralData.emit(data);
+    }
+
+    // dungeon.size; // [width, heihgt]
+    // dungeon.walls.get([x, y]); //return true if position is wall, false if empty
+
+    // for (let piece of dungeon.children) {
+    //   piece.position; //[x, y] position of top left corner of the piece within dungeon
+    //   piece.tag; // 'any', 'initial' or any other key of 'rooms' options property
+    //   piece.size; //[width, height]
+    //   piece.walls.get([x, y]); //x, y- local position of piece, returns true if wall, false if empty
+    //   for (let exit of piece.exits) {
+    //     let { x, y, dest_piece } = exit; // local position of exit and piece it exits to
+    //     piece.global_pos([x, y]); // [x, y] global pos of the exit
+    //   }
+
+    //   piece.local_pos(dungeon.start_pos); //get local position within the piece of dungeon's global position
+    // }
+
+    // dungeon.initial_room; //piece tagged as 'initial'
+    // dungeon.start_pos; //[x, y] center of 'initial' piece
   }
 }

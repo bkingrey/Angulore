@@ -2,30 +2,33 @@ import { EventEmitter, Output } from '@angular/core';
 import { GameState, GeneratedTile, Position, Tileset } from 'src/_store/models';
 
 export class MainUtils {
-  loadProceduralData(gameData: GameState): Array<GeneratedTile> {
+  loadProceduralData(
+    gameData: GameState,
+    rows: Array<Array<boolean>>,
+    verticalLength: number,
+    horizontalLength: number
+  ): Array<GeneratedTile> {
     const proceduralData: Array<GeneratedTile> = [];
     const tileset = gameData.tilesets[0];
-    const rowLength = Math.sqrt(gameData.roomPresets[0].length);
-    for (let l = 0; l < rowLength / 2; l++) {
-      for (let k = 0; k < rowLength / 2; k++) {
-        for (let i = 0; i < rowLength; i++) {
-          for (let j = 0; j < rowLength; j++) {
-            if (tileset[gameData.roomPresets[0][j + i * 10]]) {
-              proceduralData.push({
-                tileMapPosition:
-                  tileset[gameData.roomPresets[0][j + i * rowLength]],
-                x: j + k * rowLength,
-                y: i + l * rowLength,
-              });
-            }
-          }
+    for (let j = 0; j < verticalLength; j++) {
+      for (let i = 0; i < horizontalLength; i++) {
+        if (rows[j] && rows[j][i]) {
+          proceduralData.push({
+            tileMapPosition: tileset.horizontalSide,
+            x: i,
+            y: j,
+          });
+        } else {
+          proceduralData.push({
+            tileMapPosition: tileset.floor,
+            x: i,
+            y: j,
+          });
         }
       }
     }
-
     return proceduralData;
   }
-
   getRandomCorner(tileset: Tileset, amountOfTiles: number) {
     const random = this.randomIntFromInterval(5, amountOfTiles - 5);
     let generatedTile: GeneratedTile = {

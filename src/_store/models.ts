@@ -10,7 +10,6 @@ export interface GameState {
   sounds: Array<Sound>;
   scene: string;
   amountOfTiles: number;
-  roomPresets: Array<Array<string>>;
   procedurals: Array<GeneratedTile>;
   fps: number;
 }

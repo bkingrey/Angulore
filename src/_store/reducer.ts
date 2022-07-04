@@ -8,7 +8,7 @@ export const intializeState = (): GameState => {
     loading: false,
     resolution: {
       x: 1024,
-      y: 576 * 2,
+      y: 576,
     },
     tilesets: [],
     sprites: [],
@@ -16,7 +16,6 @@ export const intializeState = (): GameState => {
     scene: 'title',
     fps: 60,
     amountOfTiles: 49,
-    roomPresets: [],
     procedurals: [],
   };
 };
@@ -59,7 +58,6 @@ export const gameReducer = createReducer(
       loaded: true,
       sprites,
       tilesets,
-      roomPresets: payload.roomPresets,
     };
   }),
   on(GameActions.ChangeScene, (state: GameState, { payload }) => {
