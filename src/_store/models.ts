@@ -9,7 +9,14 @@ export interface GameState {
   sprites: Array<Sprite>;
   sounds: Array<Sound>;
   scene: string;
+  amountOfTiles: number;
+  procedural: Procedurals;
   fps: number;
+}
+
+export interface Procedurals {
+  corners: Array<GeneratedTile>;
+  sides: Array<GeneratedTile>;
 }
 
 export interface Sound {

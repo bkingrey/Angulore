@@ -15,6 +15,11 @@ export const intializeState = (): GameState => {
     sounds: [],
     scene: 'title',
     fps: 60,
+    amountOfTiles: 49,
+    procedural: {
+      corners: [],
+      sides: [],
+    },
   };
 };
 
@@ -62,6 +67,12 @@ export const gameReducer = createReducer(
     return {
       ...state,
       scene: payload,
+    };
+  }),
+  on(GameActions.ChangeProceduralData, (state: GameState, { payload }) => {
+    return {
+      ...state,
+      procedural: payload,
     };
   })
 );

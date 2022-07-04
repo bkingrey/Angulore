@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { GameState } from './models';
+import { GameState, GeneratedTile, Procedurals } from './models';
 
 export const GetGameData = createAction('[GameData] Get Game Data');
 
@@ -16,4 +16,9 @@ export const ErrorGameDataAction = createAction(
 export const ChangeScene = createAction(
   '[GameData] - Change Scene',
   props<{ payload: string }>()
+);
+
+export const ChangeProceduralData = createAction(
+  '[GameData] - Change Procedural Data',
+  props<{ payload: Procedurals }>()
 );

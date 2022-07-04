@@ -15,6 +15,7 @@ import {
   LocationStrategy,
   HashLocationStrategy,
 } from '@angular/common';
+import { MainUtils } from './scene-main/scene-main.utils';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import {
   ],
   providers: [
     AppFacade,
+    MainUtils,
     { provide: APP_BASE_HREF, useValue: '/' },
     { provide: LocationStrategy, useClass: HashLocationStrategy },
   ],

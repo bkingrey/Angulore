@@ -1,5 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ChangeScene, GetGameData } from 'src/_store/actions';
+import {
+  ChangeProceduralData,
+  ChangeScene,
+  GetGameData,
+} from 'src/_store/actions';
+import { GeneratedTile, Procedurals } from 'src/_store/models';
 import { AppFacade } from './app.facade';
 
 @Component({
@@ -16,6 +21,10 @@ export class AppComponent implements OnInit {
     this.facade.dispatch(GetGameData());
   }
 
+  // DISPATCHES
+  sendProceduralData(payload: Procedurals) {
+    this.facade.dispatch(ChangeProceduralData({ payload }));
+  }
   changeScene(scene: string) {
     this.facade.dispatch(ChangeScene({ payload: scene }));
   }

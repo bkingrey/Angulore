@@ -7,8 +7,10 @@ import {
 import {
   AfterViewInit,
   Component,
+  EventEmitter,
   Input,
   OnInit,
+  Output,
   ViewChild,
 } from '@angular/core';
 import { FPS, GameState } from 'src/_store/models';
@@ -23,6 +25,7 @@ import { MainUtils } from './scene-main.utils';
 export class SceneMainComponent extends MainUtils implements AfterViewInit {
   @Input() gameData: GameState = intializeState();
   @ViewChild('canvas') canvas: HTMLCanvasElement | null = null;
+  @Output() sendProceduralData = new EventEmitter();
   ctx: CanvasRenderingContext2D | null = null;
   then: number = 0;
   animate: any;
@@ -32,8 +35,7 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
     then: 0,
     elaspsed: 0,
   };
-  amountOfTiles = 49;
-  proceduralCorners: Array<GeneratedTile> = [];
+
   constructor() {
     super();
     this.animate = () => {
@@ -89,15 +91,25 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
   }
 
   drawStage(tileset: Tileset) {
-    for (let i = 0; i <= this.amountOfTiles; i++) {
-      for (let j = 0; j <= this.amountOfTiles; j++) {
+    for (let i = 0; i <= this.gameData.amountOfTiles; i++) {
+      for (let j = 0; j <= this.gameData.amountOfTiles; j++) {
         // DRAW FLOOR
         this.drawFromTileset(tileset, tileset.floor, {
           x: i * tileset.frameWidth,
           y: j * tileset.frameHeight,
         });
-        let corner = this.getCorner(tileset, i, j);
-        let side = this.getSide(tileset, i, j);
+        let corner = this.getBorderCorner(
+          tileset,
+          i,
+          j,
+          this.gameData.amountOfTiles
+        );
+        let side = this.getBorderSide(
+          tileset,
+          i,
+          j,
+          this.gameData.amountOfTiles
+        );
         let cornerOrSide = corner || side;
         if (cornerOrSide) {
           // DRAW CORNER OR SIDE
@@ -108,66 +120,20 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
         }
       }
     }
-    this.proceduralCorners.forEach((corner) => {
-      // DRAW PROCEDURAL CORNERS
+    // DRAW PROCEDURAL CORNERS
+    this.gameData.procedural.corners.forEach((corner) => {
       this.drawFromTileset(tileset, corner.tileMapPosition, {
         x: corner.x * tileset.frameWidth,
         y: corner.y * tileset.frameHeight,
       });
     });
-  }
-
-  getCorner(tileset: Tileset, i: number, j: number): Position | undefined {
-    if (i === 0 && j === 0) {
-      return tileset.topLeftCorner;
-    } else if (i === this.amountOfTiles && j === 0) {
-      return tileset.topRightCorner;
-    } else if (i === 0 && j === this.amountOfTiles) {
-      return tileset.bottomLeftCorner;
-    } else if (i === this.amountOfTiles && j === this.amountOfTiles) {
-      return tileset.bottomRightCorner;
-    }
-    return;
-  }
-
-  randomIntFromInterval(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-  }
-
-  getRandomCorner(tileset: Tileset) {
-    const random = this.randomIntFromInterval(5, this.amountOfTiles - 5);
-    let generatedTile: GeneratedTile = {
-      tileMapPosition: { x: 0, y: 0 },
-      x: 0,
-      y: 0,
-    };
-    if (random < 25) generatedTile.tileMapPosition = tileset.topLeftCorner;
-    else if (random < 50)
-      generatedTile.tileMapPosition = tileset.topRightCorner;
-    else if (random < 75)
-      generatedTile.tileMapPosition = tileset.bottomLeftCorner;
-    else generatedTile.tileMapPosition = tileset.bottomRightCorner;
-
-    generatedTile.x = this.randomIntFromInterval(5, this.amountOfTiles - 5);
-    generatedTile.y = this.randomIntFromInterval(5, this.amountOfTiles - 5);
-    return generatedTile;
-  }
-
-  getSide(tileset: Tileset, i: number, j: number): Position | undefined {
-    if (
-      j > 0 &&
-      j < this.amountOfTiles &&
-      (i === 0 || i === this.amountOfTiles)
-    ) {
-      return tileset.verticalSide;
-    } else if (
-      i > 0 &&
-      i < this.amountOfTiles &&
-      (j === 0 || j === this.amountOfTiles)
-    ) {
-      return tileset.horizontalSide;
-    }
-    return;
+    // DRAW PROCEDURAL SIDES
+    this.gameData.procedural.sides.forEach((side) => {
+      this.drawFromTileset(tileset, side.tileMapPosition, {
+        x: side.x * tileset.frameWidth,
+        y: side.y * tileset.frameHeight,
+      });
+    });
   }
 
   drawFromTileset(
@@ -205,41 +171,9 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.loadProceduralData();
+    this.sendProceduralData.emit(this.loadProceduralData(this.gameData));
     this.loadCanvas();
     this.startAnimatingAtFPS(this.gameData.fps);
-  }
-
-  loadProceduralData() {
-    const tileset = this.gameData.tilesets.filter(
-      (tileset) => tileset.id === 'floorTileset'
-    )[0];
-    this.loadProceduralCorners(tileset);
-  }
-
-  loadProceduralCorners(tileset: Tileset) {
-    for (let i = 0; i < 15; i++) {
-      if (!this.proceduralCorners.length) {
-        this.proceduralCorners.push(this.getRandomCorner(tileset));
-      } else {
-        const newCorner = this.getRandomCorner(tileset);
-        let canPush = this.proceduralCorners.every((corner) => {
-          if (
-            newCorner.x >= corner.x + 5 ||
-            newCorner.y >= corner.y + 5 ||
-            newCorner.x <= corner.x - 5 ||
-            newCorner.y <= corner.y - 5
-          ) {
-            return true;
-          } else {
-            return false;
-          }
-        });
-        if (canPush) {
-          this.proceduralCorners.push(newCorner);
-        }
-      }
-    }
   }
 
   keyDownEvent(event: KeyboardEvent) {
