@@ -70,7 +70,7 @@
               "browserTarget": "TerritoryGame:build:production"
             },
             "development": {
-              "browserTarget": "TheLaTerritoryGamestTowerSaga:build:development"
+              "browserTarget": "TerritoryGame:build:development"
             }
           },
           "defaultConfiguration": "development"
