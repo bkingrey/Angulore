@@ -13,7 +13,7 @@ import { AppFacade } from './app.facade';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  title = 'TheLastTowerSaga';
+  title = 'TerritoryGame';
 
   constructor(public facade: AppFacade) {}
 

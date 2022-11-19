@@ -14,10 +14,10 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'TheLastTowerSaga'`, () => {
+  it(`should have as title 'TerritoryGame'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('TheLastTowerSaga');
+    expect(app.title).toEqual('TerritoryGame');
   });
 
   it('should render title', () => {
@@ -25,7 +25,7 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.content span')?.textContent).toContain(
-      'TheLastTowerSaga app is running!'
+      'TerritoryGame app is running!'
     );
   });
 });
