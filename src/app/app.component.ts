@@ -1,10 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  ChangeProceduralData,
-  ChangeScene,
-  GetGameData,
-} from 'src/_store/actions';
-import { GeneratedTile } from 'src/_store/models';
+import { ChangeScene, GetGameData } from 'src/_store/actions';
 import { AppFacade } from './app.facade';
 
 @Component({
@@ -13,7 +8,7 @@ import { AppFacade } from './app.facade';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  title = 'TerritoryGame';
+  title = 'Angulore';
 
   constructor(public facade: AppFacade) {}
 
@@ -21,10 +16,6 @@ export class AppComponent implements OnInit {
     this.facade.dispatch(GetGameData());
   }
 
-  // DISPATCHES
-  sendProceduralData(payload: Array<GeneratedTile>) {
-    this.facade.dispatch(ChangeProceduralData({ payload }));
-  }
   changeScene(scene: string) {
     this.facade.dispatch(ChangeScene({ payload: scene }));
   }

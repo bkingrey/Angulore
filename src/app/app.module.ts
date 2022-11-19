@@ -10,12 +10,6 @@ import { AppFacade } from './app.facade';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { GameEffects } from 'src/_store/effects';
-import {
-  APP_BASE_HREF,
-  LocationStrategy,
-  HashLocationStrategy,
-} from '@angular/common';
-import { MainUtils } from './scene-main/scene-main.utils';
 
 @NgModule({
   declarations: [
@@ -31,12 +25,7 @@ import { MainUtils } from './scene-main/scene-main.utils';
     StoreDevtoolsModule.instrument({ maxAge: 25 }),
     EffectsModule.forRoot([GameEffects]),
   ],
-  providers: [
-    AppFacade,
-    MainUtils,
-    { provide: APP_BASE_HREF, useValue: '/' },
-    { provide: LocationStrategy, useClass: HashLocationStrategy },
-  ],
+  providers: [AppFacade],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

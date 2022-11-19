@@ -1,23 +1,14 @@
-import { Injectable, ViewChild } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Store, Action, select } from '@ngrx/store';
-import {
-  of,
-  Observable,
-  mergeMap,
-  map,
-  catchError,
-  withLatestFrom,
-} from 'rxjs';
+import { Store, Action } from '@ngrx/store';
+import { of, Observable, mergeMap, map, catchError } from 'rxjs';
 import { GameState } from './models';
 import { gameData } from 'src/assets/json/gamaData';
 import {
   ErrorGameDataAction,
   GetGameData,
   SuccessGetGameDataAction,
-  ChangeProceduralData,
 } from './actions';
-import { selectGameData } from './selectors';
 
 @Injectable()
 export class GameEffects {

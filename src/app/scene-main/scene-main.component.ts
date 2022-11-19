@@ -1,23 +1,13 @@
-import Dungeon from '2d-dungeon';
-import {
-  GeneratedTile,
-  Position,
-  Sprite,
-  Tileset,
-} from './../../_store/models';
 import {
   AfterViewInit,
   Component,
-  EventEmitter,
   Input,
   OnInit,
-  Output,
   ViewChild,
 } from '@angular/core';
 import { FPS, GameState } from 'src/_store/models';
 import { intializeState } from 'src/_store/reducer';
 import { MainUtils } from './scene-main.utils';
-import { Player } from '../classes/Player';
 
 @Component({
   selector: 'app-scene-main',
@@ -27,7 +17,6 @@ import { Player } from '../classes/Player';
 export class SceneMainComponent extends MainUtils implements AfterViewInit {
   @Input() gameData: GameState = intializeState();
   @ViewChild('canvas') canvas: HTMLCanvasElement | null = null;
-  @Output() sendProceduralData = new EventEmitter();
   ctx: CanvasRenderingContext2D | null = null;
   then: number = 0;
   animate: any;
@@ -37,8 +26,6 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
     then: 0,
     elaspsed: 0,
   };
-  player: Player | undefined;
-
   constructor() {
     super();
     this.animate = () => {
@@ -54,10 +41,8 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
 
   drawingCode() {
     if (this.ctx && this.canvas) {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.save();
-
-      this.ctx.scale(1, 1);
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.drawBackground();
       this.drawPlayer();
       this.ctx.restore();
@@ -88,79 +73,25 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
       this.ctx.strokeStyle = 'black';
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.stroke();
-      const tileset = this.gameData.tilesets.filter(
-        (sprite) => sprite.id === 'floorTileset'
-      )[0];
-      this.drawStage(tileset);
-    }
-  }
-
-  drawStage(tileset: Tileset) {
-    this.gameData.procedurals.forEach((procedural) => {
-      if (procedural.entrance && this.ctx) {
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'blue';
-        this.ctx.fillRect(
-          procedural.x * tileset.frameWidth,
-          procedural.y * tileset.frameHeight,
-          tileset.frameWidth,
-          tileset.frameHeight
-        );
-      } else if (procedural.exit && this.ctx) {
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'red';
-        this.ctx.fillRect(
-          procedural.x * tileset.frameWidth,
-          procedural.y * tileset.frameHeight,
-          tileset.frameWidth,
-          tileset.frameHeight
-        );
-      } else {
-        this.drawFromTileset(tileset, procedural.tileMapPosition, {
-          x: procedural.x * tileset.frameWidth,
-          y: procedural.y * tileset.frameHeight,
-        });
-      }
-    });
-  }
-
-  drawFromTileset(
-    tileset: Tileset,
-    tileMapPosition: Position,
-    canvasPosition: Position
-  ) {
-    if (this.ctx) {
-      this.ctx.drawImage(
-        tileset.img,
-        tileMapPosition.x, // tilemap position x
-        tileMapPosition.y, // tilemap position y
-        tileset.frameWidth, // width of tile
-        tileset.frameHeight, // height of tile
-        canvasPosition.x, // position on canvas x
-        canvasPosition.y, // positioin on canvas y
-        tileset.frameWidth, // draw width
-        tileset.frameHeight // draw height
-      );
     }
   }
 
   drawPlayer() {
-    if (
-      this.ctx &&
-      this.gameData.playerData.spriteSheet &&
-      this.gameData.playerData.position
-    ) {
-      if (!this.player) {
-        this.player = new Player(this.gameData.playerData);
-      } else {
-        this.player.draw(this.ctx);
-      }
+    if (this.canvas && this.ctx) {
+      this.ctx.beginPath();
+      this.ctx.rect(
+        this.canvas.width / 2 - 100,
+        this.canvas.height / 2 - 100,
+        200,
+        200
+      );
+      this.ctx.strokeStyle = 'red';
+      this.ctx.stroke();
     }
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.loadCanvas();
-    this.generateDungeon();
     this.startAnimatingAtFPS(this.gameData.fps);
   }
 
@@ -178,62 +109,5 @@ export class SceneMainComponent extends MainUtils implements AfterViewInit {
 
   mouseRightClick(event: MouseEvent) {
     // Do something on right click
-  }
-
-  // DUNGEON GENERATION
-
-  generateDungeon() {
-    let dungeon = new Dungeon({
-      size: [400, 400],
-      rooms: {
-        initial: {
-          min_size: [3, 3],
-          max_size: [3, 3],
-          max_exits: 1,
-        },
-        any: {
-          min_size: [2, 2],
-          max_size: [5, 5],
-          max_exits: 4,
-        },
-      },
-      max_corridor_length: 6,
-      min_corridor_length: 2,
-      corridor_density: 0,
-      symmetric_rooms: false,
-      interconnects: 2,
-      max_interconnect_length: 10,
-      room_count: 40,
-    });
-
-    dungeon.generate();
-    if (dungeon.walls.rows.length) {
-      const data = this.loadProceduralData(
-        this.gameData,
-        dungeon.walls.rows,
-        dungeon.walls.rows.length,
-        dungeon.walls.rows[0].length
-      );
-      this.sendProceduralData.emit(data);
-    }
-
-    // dungeon.size; // [width, heihgt]
-    // dungeon.walls.get([x, y]); //return true if position is wall, false if empty
-
-    // for (let piece of dungeon.children) {
-    //   piece.position; //[x, y] position of top left corner of the piece within dungeon
-    //   piece.tag; // 'any', 'initial' or any other key of 'rooms' options property
-    //   piece.size; //[width, height]
-    //   piece.walls.get([x, y]); //x, y- local position of piece, returns true if wall, false if empty
-    //   for (let exit of piece.exits) {
-    //     let { x, y, dest_piece } = exit; // local position of exit and piece it exits to
-    //     piece.global_pos([x, y]); // [x, y] global pos of the exit
-    //   }
-
-    //   piece.local_pos(dungeon.start_pos); //get local position within the piece of dungeon's global position
-    // }
-
-    // dungeon.initial_room; //piece tagged as 'initial'
-    // dungeon.start_pos; //[x, y] center of 'initial' piece
   }
 }
